@@ -41,8 +41,8 @@ for (var i=0; i<100; i++){
 	f={x:0, y:0, color:"orange"}
 	f.x=tc/2; //Math.floor(Math.random()*tc);
 	f.y=tc/2; //Math.floor(Math.random()*tc);
-	//
-	f.color = '#'+Math.floor(Math.random()*16777215).toString(16);
+	max_color = 16777215
+	f.color = '#'+Math.floor(Math.random()*max_color).toString(16);
 	fruit_list.push(f)
 }
 
