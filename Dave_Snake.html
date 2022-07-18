@@ -1,0 +1,175 @@
+<body style="background-color:darkblue;">
+<title>Dave Snake</title>
+<div style="text-align: center">
+<canvas id="gc" width="1000" height="1000"></canvas>
+</div>
+
+
+<script>
+//Initial setup
+window.onload=function() {
+	canv=document.getElementById("gc");
+	ctx=canv.getContext("2d");
+	ctx.font = "50px Arial";
+	document.addEventListener("keydown",keyPush);
+	document.addEventListener("keyup",keyPushUp);
+	setInterval(game,1000/1500);
+}
+
+//Initial locations, scale, velocity 
+px=py=10; //snake head?
+gs=20; //gs is game scale.  what is tc?  something about the edge of the canvas? tile count?
+tc=50;
+//ax=ay=cy=15; // a is for apple.  a a a apple
+//bx=by=cx=5; //another apple.  or let's say banana
+xv=yv=0; //velocity of the snake
+trail=[]; 
+sp=0;
+score=0;
+tail=initial_tail=maxlength=5
+
+//Draw particular 'foods'
+//mallow = {x:0, y:0, color:"white"}
+//apple = {x:10, y:10, color:"red"}
+//banana = {x:20, y:10, color:"yellow"}
+//coconut = {x:10, y:20, color:"brown"}
+//fruit_list = [mallow,apple,banana,coconut]
+
+//Create fruit list, with random fruits (color, location)
+fruit_list = []
+for (var i=0; i<100; i++){
+	f={x:0, y:0, color:"orange"}
+	f.x=tc/2; //Math.floor(Math.random()*tc);
+	f.y=tc/2; //Math.floor(Math.random()*tc);
+	//
+	f.color = '#'+Math.floor(Math.random()*16777215).toString(16);
+	fruit_list.push(f)
+}
+
+// update the fruit and snake each tick of the game
+function update_fruit(f){
+	if(f.x==px && f.y==py) { 
+		tail++; //make snake bigger
+		score++;
+		f.x=Math.floor(Math.random()*tc);
+		f.y=Math.floor(Math.random()*tc);
+	}
+	return f
+}
+
+//main portion of the game
+function game() {
+	//handle snake movement, update the location based on velocity
+	px+=xv;
+	py+=yv;
+	//handle edges of the board
+	if(px<0) {
+		px= tc-1;
+	}
+	if(px>tc-1) {
+		px= 0;
+	}
+	if(py<0) {
+		py= tc-1;
+	}
+	if(py>tc-1) {
+		py= 0;
+	}
+	ctx.fillStyle="black";
+	ctx.fillRect(0,0,canv.width,canv.height);
+
+	ctx.fillStyle="lime";
+	for(var i=0;i<trail.length;i++) {
+		ctx.fillRect(trail[i].x*gs,trail[i].y*gs,(gs-sp),(gs-sp));
+		if(trail[i].x==px && trail[i].y==py) {
+			tail = initial_tail;
+		}
+	}
+	trail.push({x:px,y:py});
+	while(trail.length>tail) {
+	trail.shift();
+	}
+	for (index = 0; index < fruit_list.length; index++) {
+		fruit_list[index] = update_fruit(fruit_list[index]);
+		ctx.fillStyle=fruit_list[index].color;  
+		//ctx.fillRect(fruit_list[index].x*gs,fruit_list[index].y*gs,gs-sp,gs-sp);
+		ctx.beginPath();
+        ctx.arc(fruit_list[index].x*gs+(gs/2), fruit_list[index].y*gs+(gs/2), gs/2, 0, Math.PI * 2, true); // Outer circle
+		ctx.stroke();
+		ctx.fill();
+		if (Math.round(Math.random()-.4)){
+		    fruit_list[index].x++
+		}
+		else {
+			//fruit_list[index].x--
+		}
+		if (Math.round(Math.random()-.4)){
+		    fruit_list[index].y++
+		}
+		else {
+			//fruit_list[index].y-- 
+		}
+		if (fruit_list[index].x > tc) {
+			fruit_list[index].x=0
+		}
+		if (fruit_list[index].y > tc) {
+			fruit_list[index].y=0
+		}
+		if (fruit_list[index].x < 0) {
+			fruit_list[index].x=tc-1
+		}
+		if (fruit_list[index].y < 0) {
+			fruit_list[index].y=tc-1
+		}
+	}
+
+	//for (let my_fruit in fruit_list){
+	//	my_fruit = update_fruit(my_fruit);
+	//	ctx.fillStyle=my_fruit.color;  
+	//    ctx.fillRect(my_fruit.x*gs,my_fruit.y*gs,gs-sp,gs-sp);
+	//}
+
+
+	// the scores in top left
+	ctx.fillStyle="white";
+	ctx.fillText(score,10,50);
+	ctx.fillText(tail, 10, 100);
+	maxlength=Math.max(tail, maxlength)
+	ctx.fillText(maxlength, 10, 150);
+}
+
+//up and down of the arrow keys.  ATM snake stops when you release the key
+
+function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 37:
+			xv=-1;yv=0;
+			break;
+		case 38:
+			xv=0;yv=-1;
+			break;
+		case 39:
+			xv=1;yv=0;
+			break;
+		case 40:
+			xv=0;yv=1;
+			break;
+	}
+}
+function keyPushUp(evt) {
+	switch(evt.keyCode) {
+		case 37:
+			xv=0;
+			break;
+		case 38:
+			yv=0;
+			break;
+		case 39:
+			xv=0;
+			break;
+		case 40:
+			yv=0;
+			break;
+	}
+}
+</script>
